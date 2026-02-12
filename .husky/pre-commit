@@ -1,0 +1,8 @@
+# GUI clients (SourceTree, etc.) don't inherit shell PATH - help them find node
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+# nvm users
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+npx lint-staged

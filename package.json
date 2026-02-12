@@ -1,0 +1,51 @@
+{
+  "name": "@apogeelabs/the-agency",
+  "version": "0.1.0",
+  "description": "Centralized Claude Code agents, commands, and workflows",
+  "type": "module",
+  "bin": {
+    "the-agency": "./bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "src/templates/",
+    "!src/templates/.claude/settings*.json"
+  ],
+  "dependencies": {
+    "prompts": "^2.4.2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "UNLICENSED",
+  "private": false,
+  "devDependencies": {
+    "@changesets/cli": "^2.29.8",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.2.3",
+    "@types/prompts": "^2.4.9",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
+    "ts-jest": "^29.4.6",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "prepack": "tsup",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,mjs,ts,css,md}": "prettier --write",
+    "*.{yml,yaml}": "prettier --write",
+    "*.json": "prettier --write"
+  },
+  "packageManager": "pnpm@10.29.3",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "unrs-resolver"]
+  }
+}

@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-    entry: ["src/cli.ts", "src/sync.ts", "src/manifest.ts"],
+    entry: ["src/cli.ts", "src/sync.ts", "src/manifest.ts", "src/install-review-plugins.ts"],
     format: ["esm"],
     target: "node22",
     outDir: "dist",

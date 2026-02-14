@@ -7,6 +7,7 @@ export interface Manifest {
     agents: ManifestItem[];
     commands: ManifestItem[];
     ai: ManifestItem[];
+    reviewPlugins: ManifestItem[];
 }
 
 export const manifest: Manifest = {
@@ -30,5 +31,25 @@ export const manifest: Manifest = {
         { file: "UnitTestGeneration.md", description: "TypeScript/Jest unit testing style guide" },
         { file: "UnitTestExamples.md", description: "Reference examples for the test style guide" },
         { file: "workflow.md", description: "Multi-agent development workflow guide" },
+    ],
+    reviewPlugins: [
+        {
+            file: "general.md",
+            description:
+                "General checks: env vars, type safety, dead code, debugging leftovers, breaking changes, binary assets",
+        },
+        {
+            file: "node-backend.md",
+            description:
+                "Node.js backend checks: API design, error handling, security, database patterns",
+        },
+        {
+            file: "react-frontend.md",
+            description: "React frontend checks: component design, hooks, rendering, accessibility",
+        },
+        {
+            file: "unit-test.md",
+            description: "Unit test checks: test quality, coverage, mocking patterns, assertions",
+        },
     ],
 };

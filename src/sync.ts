@@ -24,6 +24,11 @@ const categoryConfig: Record<string, CategoryConfig> = {
     ai: { src: "src/templates/.ai", dest: ".ai" },
 };
 
+/**
+ * Resolves manifest categories into concrete source/destination file paths.
+ * Only categories present in `categoryConfig` are valid — passing unknown
+ * categories (e.g. `reviewPlugins`) will throw at runtime.
+ */
 export function getFilesToSync(categories: Record<string, ManifestItem[]>): SyncFile[] {
     const files: SyncFile[] = [];
     for (const [category, items] of Object.entries(categories)) {
@@ -39,6 +44,10 @@ export function getFilesToSync(categories: Record<string, ManifestItem[]>): Sync
     return files;
 }
 
+/**
+ * Checks whether a file exists at the given path.
+ * Uses `fs.access` rather than `stat` to avoid TOCTOU overhead we don't need.
+ */
 export async function fileExists(path: string): Promise<boolean> {
     try {
         await access(path);
@@ -48,11 +57,25 @@ export async function fileExists(path: string): Promise<boolean> {
     }
 }
 
+/**
+ * Copies agent, command, and AI context files from the package into the
+ * consumer's project. In pick mode, presents an interactive multi-select;
+ * otherwise syncs everything.
+ *
+ * Review plugins are deliberately excluded — they have their own install
+ * flow via `install-review-plugins` since they're opt-in extras, not
+ * core setup.
+ */
 export async function sync({ pick = false } = {}): Promise<void> {
     let selectedCategories: Record<string, ManifestItem[]>;
 
     if (pick) {
-        const choices = Object.entries(manifest).flatMap(([category, items]) =>
+        // Filter to categories that have a known source/dest mapping.
+        // This keeps non-sync manifest sections (e.g. reviewPlugins) out of the prompt.
+        const syncableCategories = Object.entries(manifest).filter(
+            ([category]) => category in categoryConfig
+        );
+        const choices = syncableCategories.flatMap(([category, items]) =>
             items.map((item: ManifestItem) => ({
                 title: `${categoryConfig[category].dest}/${item.file}`,
                 description: item.description,
@@ -81,7 +104,10 @@ export async function sync({ pick = false } = {}): Promise<void> {
             selectedCategories[category].push(item);
         }
     } else {
-        selectedCategories = { ...manifest };
+        // Explicitly destructure only syncable categories to avoid pulling in
+        // manifest sections that don't belong in sync (e.g. reviewPlugins).
+        const { agents, commands, ai } = manifest;
+        selectedCategories = { agents, commands, ai };
     }
 
     const files = getFilesToSync(selectedCategories);

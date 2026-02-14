@@ -16,6 +16,9 @@ npx the-agency sync
 
 # Choose which files to sync
 npx the-agency sync --pick
+
+# Install optional review check plugins
+npx the-agency install-review-plugins
 ```
 
 Files are copied to `.claude/agents/`, `.claude/commands/`, and `.ai/` in the target project. If destination files already exist, you'll be prompted before overwriting.
@@ -92,7 +95,13 @@ applies_when: Natural language description of when these checks apply
 
 ### Pre-packaged Plugins
 
-Reference check files are available in `src/review-plugins/`. Copy any of these to `.ai/review-checks/` in your repo to activate them.
+Install review plugins interactively:
+
+```bash
+npx the-agency install-review-plugins
+```
+
+This presents a multi-select of available plugins and copies your selections to `.ai/review-checks/`.
 
 | Plugin                | Targets                                             | Checks                                                                                               |
 | --------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |

@@ -19,9 +19,14 @@ If a file exists at `docs/reports/review-fixes-[feature-name].md`, you are in a 
 
 - Follow the build plan. If you disagree with something, flag it in your report before deviating.
 - Write code that reads well six months from now.
-- Write happy-path tests alongside your implementation as specified in the build plan.
+- Write happy-path tests alongside your implementation as specified in the build plan. Follow the testing conventions in `.ai/UnitTestGeneration.md` — read it before writing any tests.
 - Comments explain WHY, not WHAT.
 - Don't over-abstract. If something is used once, it doesn't need to be a utility function.
+
+## What You Do NOT Test
+
+- **React components (.tsx files)**: Do not write unit tests for `.tsx` files. Component testing is handled separately.
+- **Barrel exports (index.ts re-exports)**: Do not write tests for files that just re-export from other modules. There's no logic to test.
 
 ## Code Standards
 

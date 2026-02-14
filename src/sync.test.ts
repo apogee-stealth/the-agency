@@ -62,8 +62,9 @@ describe("getFilesToSync", () => {
     });
 
     it("handles the full manifest", () => {
-        const files = getFilesToSync({ ...manifest });
-        const totalItems = manifest.agents.length + manifest.commands.length + manifest.ai.length;
+        const { agents, commands, ai } = manifest;
+        const files = getFilesToSync({ agents, commands, ai });
+        const totalItems = agents.length + commands.length + ai.length;
         expect(files).toHaveLength(totalItems);
     });
 });

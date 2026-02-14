@@ -10,6 +10,7 @@
     "bin/",
     "dist/",
     "src/templates/",
+    "src/review-plugins/",
     "!src/templates/.claude/settings*.json"
   ],
   "dependencies": {

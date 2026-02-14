@@ -31,7 +31,9 @@
             "Bash(chmod *)",
             "Bash(cat *)",
             "Bash(head *)",
-            "Bash(tail *)"
+            "Bash(tail *)",
+            "Bash(pnpm build:*)",
+            "mcp__voicemode__converse"
         ],
         "deny": [
             "Bash(rm -rf /*)",

@@ -31,9 +31,7 @@ Delegate to the **dev** subagent. Tell it:
 - To write its report to `docs/reports/dev-report-[feature-name].md`
 - If a file exists at `docs/reports/review-fixes-[feature-name].md`, it's a FIX LOOP — fix only those issues
 
-**After the dev agent completes**: Read `docs/reports/dev-report-[feature-name].md`. Summarize for the user what was built and note any deviations from the plan.
-
-Ask the user: **"Dev phase complete. Proceed to code review?"**
+**After the dev agent completes**: Read `docs/reports/dev-report-[feature-name].md`. Summarize for the user what was built and note any deviations from the plan. Then proceed directly to Phase 2.
 
 ## Phase 2: Code Review
 
@@ -55,13 +53,11 @@ Delegate to the **reviewer** subagent. Tell it:
 
 ### If verdict is 🟡 PASS WITH FIXES:
 
-Report the should-fix items to the user. Ask: **"Review passed with suggestions. Fix these before testing, or proceed to test hardening?"**
-
-If the user wants fixes, create the fixes file and loop back to Phase 1.
+Report the should-fix items to the user for awareness, then proceed directly to Phase 3. The should-fix items can be addressed after test hardening.
 
 ### If verdict is ✅ PASS:
 
-Proceed to Phase 3.
+Proceed directly to Phase 3.
 
 ## Phase 3: Test Hardening
 
@@ -120,6 +116,6 @@ When all phases pass, produce a final summary:
 
 1. **Delegate to subagents.** Do NOT try to simulate a persona by changing your own behavior. Use the actual subagents so they get isolated context.
 2. **Subagents communicate ONLY through files.** Build plans, reports, and the codebase itself. Never pass conversation context.
-3. **Always pause for user confirmation between phases.** The user is the decision-maker.
+3. **Proceed automatically between phases.** Do not ask the user for permission to continue. Report what happened and move on. The user can interrupt if needed.
 4. **Cap fix loops at 2 per phase.** If it's still failing, the human needs to look at it.
 5. **Report what happened, not what the agent said.** Read the output files and summarize.

@@ -22,7 +22,9 @@ export const manifest: Manifest = {
         { file: "architect.md", description: "Interactive architecture design sessions" },
         { file: "build.md", description: "Build orchestrator pipeline" },
         { file: "pm.md", description: "Interactive product requirements discovery" },
+        { file: "prep-pr.md", description: "Pre-submission PR prep and draft creation" },
         { file: "review-pr.md", description: "Structured PR review briefing" },
+        { file: "weekly-summary.md", description: "Weekly synthesis of merged PRs" },
     ],
     ai: [
         { file: "UnitTestGeneration.md", description: "TypeScript/Jest unit testing style guide" },

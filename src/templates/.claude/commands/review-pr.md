@@ -62,23 +62,9 @@ Before analysis, categorize the changed files:
 - `*.min.js`, `*.min.css`, `dist/*`, `build/*` → "generated/bundled files"
 - Binary files (images, fonts, etc.) → "binary file added/modified/deleted"
 
-**Categorize by area** (for this monorepo):
+**Categorize by area:**
 
-- `packages/shared/*` → shared package
-- `packages/db/*` → database package
-- `packages/core/*` → core business logic
-- `packages/telemetry/*` → telemetry package
-- `services/api/*` → API service
-- `tests/*` → test files
-- `.claude/*` → Claude Code configuration
-- Other paths → categorize by top-level directory
-
-**Identify file types present** (for tribal knowledge checks):
-
-- React/frontend: `*.tsx`, `*.jsx`, `*.css`, `*.scss`, `*.styled.ts`
-- Backend: `*.ts` in `packages/*` or `services/*` (excluding test files)
-- Test files: `*.test.ts`, `*.spec.ts`, `*.integration.test.ts`
-- Config: `*.json`, `*.yaml`, `*.yml`, `*.env*`
+Group changed files by top-level directory. If the repo uses workspaces (check for a `workspaces` field in `package.json` or the presence of `pnpm-workspace.yaml`), use the workspace definitions to inform grouping. Otherwise, fall back to top-level directory names.
 
 ## Step 5: Analyze Changes
 
@@ -147,26 +133,43 @@ Scan for and report:
 
 ## Step 7: Tribal Knowledge Checks
 
-Run checks based on which file types are present in the diff. Only report checks that are relevant to the files actually changed:
+Tribal knowledge checks are loaded dynamically from `.ai/review-checks/`. Each check file is a markdown file with YAML frontmatter.
 
-### If React/CSS/style files are present:
+**Expected check file format:**
 
-- [ ] **Hard-coded colors**: Are there hex values, rgb(), or named colors that should use theme variables?
-- [ ] **Missing data-cy attributes**: Do new interactive elements (buttons, inputs, links) have `data-cy` for testing?
-- [ ] **Accessibility gaps**: Missing alt text on images? Click handlers on non-interactive elements (div, span)? Missing aria labels on icon-only buttons?
+```markdown
+---
+name: Example Check Group
+applies_when: Changed files include .ts files in src/
+---
 
-### If backend files are present:
+- [ ] **Check name**: Description of what to look for.
+- [ ] **Another check**: Description of what to look for.
+```
 
-- [ ] **Console.log usage**: Is `console.log` used instead of the structured logger from `@avol/telemetry`?
-- [ ] **Boundary violations**: Is a handler reaching into a repository directly instead of going through a service?
-- [ ] **Raw SQL**: Are there string-concatenated queries instead of parameterized Kysely queries?
-- [ ] **Error handling**: Are errors being caught and swallowed without logging or re-throwing?
+**Discovery and evaluation flow:**
 
-### Always check:
+1. List available check files:
 
-- [ ] **New environment variables**: Are there new `process.env.*` references that DevOps needs to know about?
-- [ ] **Test coverage**: Do new code paths have corresponding test files? Are there new functions/methods without tests?
-- [ ] **Type safety**: Are there `any` types, type assertions (`as`), or `@ts-ignore` comments that bypass TypeScript?
+```bash
+ls .ai/review-checks/*.md 2>/dev/null
+```
+
+2. **If the directory does not exist or contains no `.md` files**, skip the entire Tribal Knowledge Checks section — produce no heading and no placeholder text.
+
+3. **If files are found**, read each one:
+
+```bash
+cat .ai/review-checks/*.md
+```
+
+4. For each file, parse the YAML frontmatter to extract `name` and `applies_when`. If a file is missing frontmatter or has invalid/unparseable YAML, skip it and note in the output: "Skipped `{filename}`: missing or invalid frontmatter."
+
+5. Evaluate each file's `applies_when` value against the list of changed files from the diff (gathered in Step 3). Use your judgment — `applies_when` is natural language, not a glob pattern. Match generously but sensibly.
+
+6. For each check group where `applies_when` matches, include its checks in the output under a heading using the `name` from frontmatter. Evaluate each check against the actual diff.
+
+7. If files exist but **none** of their `applies_when` criteria match the diff, skip the Tribal Knowledge Checks section entirely.
 
 ## Step 8: Testing Recommendations
 
@@ -241,9 +244,9 @@ Each block contains:
 
 ## Tribal Knowledge Checks
 
-[Based on file types present, report findings. Only include checks relevant to the file types in this PR.]
+[Only include this section if matching check files were found in .ai/review-checks/. If no check files exist or none matched the diff, omit this entire section including the heading.]
 
-### [Check category]
+### [name from check file frontmatter]
 
 - [x] [Check passed or N/A]
 - [ ] **[Check failed]**: [Specific finding with file:line references]

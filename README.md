@@ -39,12 +39,14 @@ Autonomous subagents that run in isolated context windows and communicate throug
 
 Slash commands invoked in Claude Code sessions.
 
-| Command      | Purpose                                            |
-| ------------ | -------------------------------------------------- |
-| `/architect` | Interactive architecture design session            |
-| `/build`     | Orchestrates the full dev → review → test pipeline |
-| `/pm`        | Interactive product requirements discovery         |
-| `/review-pr` | Structured PR review briefing                      |
+| Command           | Purpose                                            |
+| ----------------- | -------------------------------------------------- |
+| `/architect`      | Interactive architecture design session            |
+| `/build`          | Orchestrates the full dev → review → test pipeline |
+| `/pm`             | Interactive product requirements discovery         |
+| `/prep-pr`        | Pre-submission PR prep and draft creation          |
+| `/review-pr`      | Structured PR review briefing                      |
+| `/weekly-summary` | Weekly synthesis of merged PRs                     |
 
 ### AI Context (`.ai/`)
 
@@ -67,6 +69,37 @@ Reference material automatically available to Claude Code.
 - Agents communicate only through the filesystem. No shared context. This is intentional.
 
 See `.ai/workflow.md` after syncing for the full workflow guide.
+
+## Review Checks (`.ai/review-checks/`)
+
+The `/review-pr` command supports pluggable tribal knowledge checks. Place markdown files in `.ai/review-checks/` in your repo, and the review command discovers and evaluates them automatically.
+
+### Check File Format
+
+Each file uses YAML frontmatter with two fields:
+
+```markdown
+---
+name: Display Name for This Check Group
+applies_when: Natural language description of when these checks apply
+---
+
+- [ ] **Check name**: What to look for.
+```
+
+- **`name`** — heading used in the review output
+- **`applies_when`** — evaluated by the LLM against the PR's changed file list. Use plain language (e.g., "Changed files include `.tsx` files" or "Always").
+
+### Pre-packaged Plugins
+
+Reference check files are available in `src/review-plugins/`. Copy any of these to `.ai/review-checks/` in your repo to activate them.
+
+| Plugin                | Targets                                             | Checks                                                                                               |
+| --------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **react-frontend.md** | `.tsx`, `.jsx`, `.css`, `.scss`, `.styled.ts` files | Hard-coded colors, missing `data-cy` attributes, accessibility gaps                                  |
+| **node-backend.md**   | `.ts` files in backend/service directories          | `console.log` usage, boundary violations, raw SQL, error swallowing                                  |
+| **general.md**        | All PRs (unconditional)                             | New env vars, dead code, dependency changes, type safety (`any`, `as`, `@ts-ignore`)                 |
+| **unit-test.md**      | `.test.ts`, `.spec.ts` files                        | Style guide adherence, barrel export testing, test description accuracy, missing `export default {}` |
 
 ## Project-Specific Configuration
 

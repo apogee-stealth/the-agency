@@ -1,5 +1,11 @@
 # @apogeelabs/the-agency
 
+## 0.3.1
+
+### Patch Changes
+
+- Fix review-pr command so that it stays focused on target PR
+
 ## 0.3.0
 
 ### Minor Changes

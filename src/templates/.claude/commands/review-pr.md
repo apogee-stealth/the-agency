@@ -39,18 +39,19 @@ gh pr view --json number,title,baseRefName,headRefName,body,additions,deletions,
 
 ## Step 3: Gather Diff Information
 
-Run these commands:
+Use `gh pr diff` to get the diff as GitHub sees it. This avoids stale-local-branch problems where a behind-origin base branch inflates the diff with already-merged changes from other PRs.
 
 ```bash
 # File list with change stats
-git diff --stat $baseRefName...HEAD
+gh pr diff --stat
 
 # Full diff (for analysis)
-git diff $baseRefName...HEAD
-
-# Commit log (excluding merges)
-git log --no-merges --oneline $baseRefName..HEAD
+gh pr diff
 ```
+
+**For commit messages**, use the `commits` array already captured in Step 2 — that is the authoritative commit list for this PR. Do NOT use `git log`, which can include commits from other PRs if the local base branch is behind origin.
+
+**Cross-check**: Compare the file count from `gh pr diff --stat` against the `changedFiles` value from Step 2. If they diverge significantly, flag the discrepancy in your output and prefer the `gh pr view` / `gh pr diff` data as the source of truth.
 
 ## Step 4: Categorize and Filter Files
 
@@ -279,4 +280,4 @@ Each block contains:
 - **Be honest about uncertainty.** If you can't determine why a change was made, say so. "Purpose unclear — reviewer should check with author."
 - **Don't hallucinate.** Only report what you actually see in the diff. If a file wasn't changed, don't claim it was.
 - **Prioritize signal over completeness.** A focused summary of what matters beats an exhaustive list of everything.
-- **No raw file lists.** Do NOT include a "Files Changed" section or dump the `git diff --stat` output. GitHub already shows this. Your job is synthesis, not regurgitation.
+- **No raw file lists.** Do NOT include a "Files Changed" section or dump the `gh pr diff --stat` output. GitHub already shows this. Your job is synthesis, not regurgitation.

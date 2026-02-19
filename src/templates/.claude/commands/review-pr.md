@@ -132,6 +132,10 @@ Scan for and report:
 - Major version bumps
 - Dependencies with known security issues
 
+**Before finalizing risk callouts related to test files (`.test.ts`, `.spec.ts`):**
+
+Read `.ai/UnitTestGeneration.md` (if it exists) and cross-reference any test-related findings against the project's testing conventions. Do NOT flag patterns that conform to those guidelines — they are intentional, not risks.
+
 ## Step 7: Tribal Knowledge Checks
 
 Tribal knowledge checks are loaded dynamically from `.ai/review-checks/`. Each check file is a markdown file with YAML frontmatter.
@@ -189,6 +193,7 @@ Based on the changes in this PR, provide concrete testing recommendations. This 
 - New code paths that lack corresponding tests
 - Behavioral changes that existing tests might not cover
 - Specific test scenarios to add (with enough detail to write the test)
+- **Do NOT recommend tests for React components (`.tsx` files).** We do not unit test React components.
 
 **Regression risks:**
 

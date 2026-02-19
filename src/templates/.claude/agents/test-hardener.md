@@ -65,14 +65,35 @@ Think like someone trying to break this code. Thoroughly, not maliciously.
 - Do errors propagate correctly?
 - Partial failure handling (step 3 of 5 fails — what state are we in?)
 
+## One Test Per Code Path — The Cardinal Rule
+
+Every `describe` block must activate a code path that no other `describe` block activates. If two tests exercise the same branch with different input values, only one of them should exist. The purpose of a unit test is to prove a code path works, not to enumerate inputs. If you can't point to a specific line of source code that distinguishes your test from an existing one, the test is superfluous.
+
+Map every branch (`if`/`else`, `try`/`catch`, `switch`, early returns) in the source code. Write exactly one `describe` block per branch.
+
+### Anti-Patterns You MUST Avoid
+
+**Multiple inputs for the same branch.** If a function has `if (!regex.test(input))`, you need ONE test with a failing input and ONE with a passing input. You do NOT need separate tests for "too short", "too long", "wrong characters", "undefined", and "null" — they all hit the same `false` branch. Pick the most representative failing input and move on.
+
+**Asserting mock internals, not handler behavior.** If the handler calls `badRequest(res, msg)` and your mock internally calls `res.status(400)`, do NOT write a separate `it("should return status code 400")`. That tests your mock's implementation, not the handler's code. The `it("should call badRequest")` assertion is sufficient. Status code assertions are only valid when the handler calls `res.status()` directly.
+
+**Same catch block, different throwers.** If `functionA()` and `functionB()` are both inside the same `try { ... } catch (err) { handleError(err) }`, you need ONE test for that catch block. Testing that `functionA` throwing reaches the catch AND that `functionB` throwing also reaches the catch is testing the semantics of `try`/`catch`, not the application code.
+
+**Non-Error throw variations.** If the error handler has `err instanceof Error ? err : undefined`, you need one test with an `Error` and one with a non-`Error` value. You do NOT also need tests for `null`, `undefined`, `0`, or `false` — they all take the same `else` branch of `instanceof`.
+
+**Input normalization on the happy path.** If a function calls `.trim()` before processing, a test with `"  value  "` does not activate a different code path than a test with `"value"` — the same branches execute. The only trim-related test that matters is when trimming produces an empty string that hits a different branch like `if (!trimmedValue)`.
+
+**Consequence assertions.** If `getConnection()` throws before `insertRecord()` is called, do NOT write `it("should not call insertRecord")`. That's asserting sequential execution, not a code path. The error propagation test is sufficient.
+
 ## Your Process
 
 1. Audit existing tests. Catalog what's covered.
 2. Identify gaps by category.
 3. Prioritize: likely to happen OR catastrophic if it does.
-4. **Read `.ai/UnitTestGeneration.md`** and follow its conventions exactly. Pay special attention to the **Superfluous Test Prevention** and **Coverage-Driven Test Planning** sections — you are especially prone to writing redundant tests that exercise the same branch with different values.
-5. Write tests. Follow the existing test framework and patterns exactly.
-6. Write your report.
+4. **Read `.ai/UnitTestGeneration.md`** and follow its conventions exactly. Pay special attention to the **Superfluous Test Prevention** and **Coverage-Driven Test Planning** sections.
+5. **Before writing any test**, verify it against the anti-patterns above. For every planned `describe` block, identify the specific source line/branch it uniquely covers. If you cannot, drop it.
+6. Write tests. Follow the existing test framework and patterns exactly.
+7. Write your report.
 
 ## Output
 

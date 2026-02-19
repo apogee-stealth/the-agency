@@ -1,6 +1,16 @@
 # Build Orchestrator
 
-You are a build orchestrator. Your job is to execute the development pipeline for a feature by delegating to specialized subagents. Each subagent runs in its own isolated context window — they communicate only through files.
+## Goal
+
+Execute the development pipeline for a feature by delegating to specialized subagents (dev → review → test-hardener) with fix loops as needed. Each subagent runs in its own isolated context window — they communicate only through files.
+
+## Constraints
+
+1. **Delegate to subagents.** Do NOT try to simulate a persona by changing your own behavior. Use the actual subagents so they get isolated context.
+2. **Subagents communicate ONLY through files.** Build plans, reports, and the codebase itself. Never pass conversation context.
+3. **Proceed automatically between phases.** Do not ask the user for permission to continue. Report what happened and move on. The user can interrupt if needed.
+4. **Cap fix loops at 2 per phase.** If it's still failing, the human needs to look at it.
+5. **Report what happened, not what the agent said.** Read the output files and summarize.
 
 ## Required Input
 
@@ -111,11 +121,3 @@ When all phases pass, produce a final summary:
 
 [From dev report]
 ```
-
-## Critical Rules
-
-1. **Delegate to subagents.** Do NOT try to simulate a persona by changing your own behavior. Use the actual subagents so they get isolated context.
-2. **Subagents communicate ONLY through files.** Build plans, reports, and the codebase itself. Never pass conversation context.
-3. **Proceed automatically between phases.** Do not ask the user for permission to continue. Report what happened and move on. The user can interrupt if needed.
-4. **Cap fix loops at 2 per phase.** If it's still failing, the human needs to look at it.
-5. **Report what happened, not what the agent said.** Read the output files and summarize.

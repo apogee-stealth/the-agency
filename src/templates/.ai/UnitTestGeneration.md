@@ -1,6 +1,23 @@
 # TypeScript/Jest Unit Testing Style Guide (v2)
 
-Carefully analyze the jest-based unit test modules I've provided below, and take careful note of how I write unit tests. You will use this style guide to generate unit tests for new modules in subsequent requests.
+## Goal
+
+This is your testing style guide. Follow these conventions when writing Jest/TypeScript unit tests. For working examples that demonstrate these patterns, see `.ai/UnitTestExamples.md`.
+
+## Pre-Writing Checklist
+
+Before generating any tests, complete these steps in order:
+
+1. **Branch analysis** (Coverage-Driven Test Planning): Read the source, enumerate every branch, map each to a test scenario.
+2. **Superfluous test check** (Superfluous Test Prevention): Verify each planned scenario covers a distinct branch, not the same branch with different values.
+3. **Execution location check** (CRITICAL RULE #1): Execute methods under test in `beforeEach()`, not in `it()` blocks.
+4. **Mock configuration check** (CRITICAL RULE #2): Configure mock behavior in `beforeEach`, not at module level.
+5. **Callback invocation check** (CRITICAL RULE #3): Use `mockImplementation` for callbacks, not `mock.calls[N][M]()`.
+
+Once tests are generated:
+
+- verify that you haven't fallen into one of the pitfalls described in this guide
+- you can run the test to see if the output has errors
 
 ---
 
@@ -437,41 +454,15 @@ Am I in the **outer** `beforeEach`?
 - **Performance consideration**: Avoid unnecessary async operations or complex computations in tests
 - **Assertion clarity**: Use specific matchers (toHaveBeenCalledWith vs toHaveBeenCalled)
 
-## IMPORTANT! Common Pitfalls to Avoid
+---
 
-Pay close attention to these items, since they may apply some nuance to the above rules.
+## Common Pitfalls to Avoid
+
+These pitfalls are not covered by the critical rules or earlier sections. Pay close attention.
 
 - **Complex test setup**: If setup is complex, consider breaking into smaller, focused tests
 - **Unused arguments**: If a mock (for example mockImplementation) has a method with unused arguments, be sure to prefix them with "\_" to prevent eslint/typescript compiler errors related to unused arguments.
 - **Missing cleanup**: Always restore mocked timers, global variables, and environment changes
 - **Snapshot overuse**: Use snapshots sparingly - prefer explicit assertions for critical data
 - **Over-engineering test cases**: do not over-engineer test scenarios that don't exist in the actual implementation. For example, if a method takes a callback (like expresses app.listen()), don't test for cases like "if app.listen returns without calling callback" unless you are specifically told to do so.
-- **Do not invent error paths**: Do not invent error paths when there aren't explicit try/catch or promise rejections
-- **Executing method under test in it() blocks**: The method under test MUST be executed in `beforeEach()`, with results stored in variables. The `it()` blocks should ONLY contain assertions against those variables. This is a non-negotiable rule - review **CRITICAL RULE #1** before generating any tests.
-- **Configuring mock behavior at module level**: Mock return values and implementations MUST be set inside `beforeEach`/`beforeAll`, not at module level. Review **CRITICAL RULE #2**.
-- **Imperatively invoking callbacks via mock.calls**: Use `mockImplementation`/`mockImplementationOnce` to invoke callbacks, not `mock.calls[N][M]()`. Review **CRITICAL RULE #3**.
-- **Writing superfluous tests**: Do not write multiple test scenarios that exercise the same code path with different literal values. Review the **Superfluous Test Prevention** section.
-- **Skipping branch analysis**: Always perform a systematic branch analysis before writing tests. Review the **Coverage-Driven Test Planning** section.
-- **Missing `export default {}`**: Every test file must include `export default {};` at the top (after pragmas) to prevent global collision. Forgetting it causes cryptic failures across test files.
-- **Over-asserting log calls**: Do not assert info/debug/silly log calls unless the log is the _only_ statement in a code path. Only assert warn, error, and critical level logs.
-
----
-
-The above guidelines represent my core testing patterns. For full working examples that demonstrate these conventions, see `.ai/UnitTestExamples.md`. You may also analyze the style of other `*.test.ts` files in this project and generate tests. Avoid repeating all test cases for all permutations of a function. Focus on covering as much as possible in general test cases and then only assert against the specific differences in more specific test cases.
-Be sure to pay attention to the "Common Pitfalls to Avoid" section above.
-Before writing error tests, verify that the function actually has: - try/catch blocks - explicit error handling - promise rejection handling
-If none exist, do NOT write error tests.
-
-**CRITICAL REMINDER — Pre-Writing Checklist:**
-Before generating any tests, complete these steps in order:
-
-1. **Branch analysis** (Coverage-Driven Test Planning): Read the source, enumerate every branch, map each to a test scenario.
-2. **Superfluous test check** (Superfluous Test Prevention): Verify each planned scenario covers a distinct branch, not the same branch with different values.
-3. **Execution location check** (CRITICAL RULE #1): Execute methods under test in `beforeEach()`, not in `it()` blocks.
-4. **Mock configuration check** (CRITICAL RULE #2): Configure mock behavior in `beforeEach`, not at module level.
-5. **Callback invocation check** (CRITICAL RULE #3): Use `mockImplementation` for callbacks, not `mock.calls[N][M]()`.
-
-Once tests are generated:
-
-- verify that you haven't fallen into one of the pitfalls I've described
-- you can run the test to see if the output has errors
+- **Do not invent error paths**: Do not invent error paths when there aren't explicit try/catch or promise rejections. Before writing error tests, verify that the function actually has try/catch blocks, explicit error handling, or promise rejection handling. If none exist, do NOT write error tests.

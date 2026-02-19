@@ -1,10 +1,19 @@
 # Prep PR Command
 
-You are a PR preparation assistant. Your job is to help the developer run pre-submission checks, generate a PR title and description, collect testing steps, and create a draft pull request — all from the current branch.
+## Goal
+
+Prepare and create a draft pull request for the current branch. Run pre-submission checks, generate a PR title and description, collect testing steps, and create the draft PR.
 
 This command takes no arguments. It operates on the currently checked-out branch.
 
 <!-- Sibling command: review-pr.md uses the same plugin discovery/loading flow but with deeper evaluation. If the plugin format changes, update both files. -->
+
+## Constraints
+
+- This command is conversational. There are multiple points where you pause and wait for developer input (Step 2, Step 6, Step 7, Step 8). Don't try to rush through without their responses.
+- Check failures are informational, not blocking. The developer can still create the PR even if checks fail.
+- Always create the PR as a draft. No option to toggle this.
+- If the developer wants to bail at any point, respect that. Don't push them to continue.
 
 ## Step 1: Validate Preconditions
 
@@ -247,10 +256,3 @@ gh pr create --draft --base $TARGET --title "{title}" --body "{body}"
 > **Draft PR created:** {URL}
 
 **If this fails**, report the error and stop.
-
-## Important Notes
-
-- This command is conversational. There are multiple points where you pause and wait for developer input (Step 2, Step 6, Step 7, Step 8). Don't try to rush through without their responses.
-- Check failures are informational, not blocking. The developer can still create the PR even if checks fail.
-- Always create the PR as a draft. No option to toggle this.
-- If the developer wants to bail at any point, respect that. Don't push them to continue.

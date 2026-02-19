@@ -1,6 +1,19 @@
 # Weekly Summary Command
 
-You are a codebase narrator. Your job is to synthesize the last 7 days of merged pull requests into a thematic briefing that updates a developer's mental model of how the codebase shifted — not a changelog, not a list of PRs, but a narrative of what changed and why it matters.
+## Goal
+
+Synthesize the last 7 days of merged pull requests into a thematic briefing that updates a developer's mental model of how the codebase shifted — not a changelog, not a list of PRs, but a narrative of what changed and why it matters.
+
+## Constraints
+
+- **Group by theme, not by PR.** This is the most important constraint. If you catch yourself writing "PR #N:" at the start of a bullet, you've already failed. Restructure around themes.
+- **Do NOT summarize each PR individually.** Do NOT produce a bulleted list of PR titles. Do NOT write "PR #42 did X, PR #43 did Y."
+- **Think like a teammate giving a hallway briefing**, not a release notes generator. The reader was away for a week and wants to rebuild their mental model in 5 minutes.
+- **Diffstats are your best friend.** PR titles can be misleading. PR descriptions can be empty. But file paths and change volumes don't lie. Lean on them.
+- **Be concise.** This is a briefing, not a novel. Each thematic section should be a tight paragraph or two.
+- **Be honest.** Uncertainty is fine. "Not sure what this was about" beats a confident hallucination every time.
+- **Never hallucinate changes.** Only report what the data shows. If a file wasn't in any diffstat, don't claim it was changed.
+- **Prioritize signal.** Not every PR deserves mention. A typo fix or a lockfile update doesn't need a thematic narrative. Focus on changes that actually shift how a developer thinks about the codebase.
 
 ## Step 1: Determine Date Range
 
@@ -70,8 +83,6 @@ With all PR metadata and file-level stats assembled, produce the output. The out
 
 This is the core of the report. Group changes **by theme, not by PR**.
 
-**Do NOT summarize each PR individually.** Do NOT produce a bulleted list of PR titles. Do NOT write "PR #42 did X, PR #43 did Y." A developer reading this should understand the _narrative_ of what shifted — as if a teammate is giving them a hallway briefing after a week away.
-
 Good themes look like:
 
 - "Auth migrated from session cookies to JWT"
@@ -93,8 +104,6 @@ If multiple PRs contribute to the same theme, **weave them together** into a sin
 **Use file paths to reveal what changed.** Even when PR descriptions are sparse or absent, the file paths in the diffstat tell you which areas of the codebase were affected. A cluster of changes in `src/auth/` tells a story even without a word of description.
 
 **Be honest about uncertainty.** If PR descriptions are vague and the diffstats are ambiguous, say so. "Several PRs touched the payments module but descriptions were sparse — worth checking with the team on what shifted" is better than fabricating a narrative.
-
-**Never hallucinate changes.** Only report what the data shows. If a file wasn't in any diffstat, don't claim it was changed.
 
 ### Risk Callouts
 
@@ -137,12 +146,3 @@ Write the synthesized report to `docs/reports/weekly-summary-YYYY-MM-DD.md` (usi
 
 [Bulleted risk items with enough context to understand the concern, or "No significant risks identified."]
 ```
-
-## Behavioral Guidance
-
-- **Think like a teammate giving a hallway briefing**, not a release notes generator. The reader was away for a week and wants to rebuild their mental model in 5 minutes.
-- **Group by theme, not by PR.** This is the most important instruction. If you catch yourself writing "PR #N:" at the start of a bullet, you've already failed. Restructure around themes.
-- **Diffstats are your best friend.** PR titles can be misleading. PR descriptions can be empty. But file paths and change volumes don't lie. Lean on them.
-- **Be concise.** This is a briefing, not a novel. Each thematic section should be a tight paragraph or two — enough to update the reader's mental model, not enough to replace reading the actual PRs.
-- **Be honest.** Uncertainty is fine. "Not sure what this was about" beats a confident hallucination every time.
-- **Prioritize signal.** Not every PR deserves mention. A typo fix or a lockfile update doesn't need a thematic narrative. Focus on changes that actually shift how a developer thinks about the codebase.

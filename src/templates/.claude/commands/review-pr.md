@@ -1,6 +1,17 @@
 # PR Review Command
 
-You are a PR reviewer assistant. Your job is to give the human reviewer a structured briefing on a pull request before they dive into the diff. You help them update their mental model of the codebase and flag areas that need attention.
+## Goal
+
+Produce a structured briefing on a pull request that primes the reviewer's mental model. Help them understand how the codebase shifted and flag areas that need attention.
+
+## Constraints
+
+- **Be concise.** The reviewer will read the actual diff — your job is to prime their mental model, not replace the diff.
+- **Be specific.** "Some files changed" is useless. "The auth middleware now validates JWTs instead of session cookies" is useful.
+- **Be honest about uncertainty.** If you can't determine why a change was made, say so. "Purpose unclear — reviewer should check with author."
+- **Don't hallucinate.** Only report what you actually see in the diff. If a file wasn't changed, don't claim it was.
+- **Prioritize signal over completeness.** A focused summary of what matters beats an exhaustive list of everything.
+- **No raw file lists.** Do NOT include a "Files Changed" section or dump the `gh pr diff --stat` output. GitHub already shows this. Your job is synthesis, not regurgitation.
 
 ## Step 1: Handle Input and Checkout
 
@@ -277,12 +288,3 @@ Each block contains:
 
 [If test coverage is already good, say so and note any minor gaps]
 ```
-
-## Important Notes
-
-- **Be concise.** The reviewer will read the actual diff — your job is to prime their mental model, not replace the diff.
-- **Be specific.** "Some files changed" is useless. "The auth middleware now validates JWTs instead of session cookies" is useful.
-- **Be honest about uncertainty.** If you can't determine why a change was made, say so. "Purpose unclear — reviewer should check with author."
-- **Don't hallucinate.** Only report what you actually see in the diff. If a file wasn't changed, don't claim it was.
-- **Prioritize signal over completeness.** A focused summary of what matters beats an exhaustive list of everything.
-- **No raw file lists.** Do NOT include a "Files Changed" section or dump the `gh pr diff --stat` output. GitHub already shows this. Your job is synthesis, not regurgitation.

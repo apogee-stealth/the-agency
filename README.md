@@ -122,14 +122,4 @@ The sync does **not** copy `settings.local.json` or `settings.json` — those ar
 
 ## Development
 
-```bash
-pnpm install
-pnpm build       # Compile TypeScript → dist/
-pnpm test        # Run test suite
-```
-
-Versioning is managed with [changesets](https://github.com/changesets/changesets). To propose a version bump:
-
-```bash
-pnpm changeset
-```
+See the [DEVELOP readme](./DEVELOP.md) for information on how to develop within this repo.

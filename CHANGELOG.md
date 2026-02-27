@@ -1,5 +1,11 @@
 # @apogeelabs/the-agency
 
+## 0.5.0
+
+### Minor Changes
+
+- dcfb3b4: Added unit test generation instructions for equality matching and floating point numbers.
+
 ## 0.4.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@apogeelabs/the-agency",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Centralized Claude Code agents, commands, and workflows",
   "type": "module",
   "bin": {

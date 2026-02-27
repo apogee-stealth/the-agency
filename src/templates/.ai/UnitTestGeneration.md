@@ -414,8 +414,9 @@ Am I in the **outer** `beforeEach`?
     - Always assert **count first**, then **arguments**: `toHaveBeenCalledTimes` before `toHaveBeenCalledWith`
     - Use `toHaveBeenNthCalledWith` for multiple calls with different args
 - **Equality matchers**:
-    - Use `toBe` for primitives (strings, numbers, booleans, null, undefined) — it checks reference equality
+    - Use `toBe` for primitives (strings, integers, booleans, null, undefined) — it checks reference equality
     - Use `toEqual` for objects and arrays — it checks deep equality
+    - Use `toBeCloseTo` for floating-point numbers - it is tolerant of JavaScript's surprising rounding behavior
     - Never use `toBe` on objects (it will fail even if the contents match) or `toEqual` on primitives (it works but is imprecise)
 - **Assertion granularity** (in order of preference):
     1. **Full match** with `toEqual` — assert the entire object/array when possible

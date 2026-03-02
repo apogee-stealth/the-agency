@@ -1,5 +1,11 @@
 # @apogeelabs/the-agency
 
+## 0.6.0
+
+### Minor Changes
+
+- ef410f2: Add DnD Alignment Command
+
 ## 0.5.0
 
 ### Minor Changes

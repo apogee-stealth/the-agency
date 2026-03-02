@@ -26,6 +26,7 @@ export const manifest: Manifest = {
         { file: "prep-pr.md", description: "Pre-submission PR prep and draft creation" },
         { file: "review-pr.md", description: "Structured PR review briefing" },
         { file: "weekly-summary.md", description: "Weekly synthesis of merged PRs" },
+        { file: "dnd-alignment.md", description: "D&D alignment chart from commit history" },
     ],
     ai: [
         { file: "UnitTestGeneration.md", description: "TypeScript/Jest unit testing style guide" },

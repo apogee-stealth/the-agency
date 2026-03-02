@@ -50,6 +50,7 @@ Slash commands invoked in Claude Code sessions.
 | `/prep-pr`        | Pre-submission PR prep and draft creation          |
 | `/review-pr`      | Structured PR review briefing                      |
 | `/weekly-summary` | Weekly synthesis of merged PRs                     |
+| `/dnd-alignment`  | D&D alignment chart from commit history            |
 
 ### AI Context (`.ai/`)
 

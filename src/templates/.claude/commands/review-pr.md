@@ -223,7 +223,7 @@ Based on the changes in this PR, provide concrete testing recommendations. This 
 Produce your output as inline markdown with these sections:
 
 ```markdown
-# PR Review: #{number} — {title}
+# {title}
 
 **Branch**: {headRefName} → {baseRefName}
 **Changes**: {additions} additions, {deletions} deletions across {changedFiles} files
@@ -288,3 +288,31 @@ Each block contains:
 
 [If test coverage is already good, say so and note any minor gaps]
 ```
+
+## Step 9: Offer to Update PR Description
+
+After producing the review output, ask the user:
+
+> **Would you like to update the PR description with this review?**
+
+If the user declines, you're done.
+
+If the user accepts, update the PR description by prepending the review content above the original description, separated as follows:
+
+```
+{review content}
+
+---
+Original PR Description
+---
+
+{original PR description}
+```
+
+Use the `body` captured in Step 2 as the original PR description. Update the PR with:
+
+```bash
+gh pr edit --body "{new body content}"
+```
+
+⚠️ **Preserve the original description exactly as-is** — no reformatting, no trimming, no "improving" it.

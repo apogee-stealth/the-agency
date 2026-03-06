@@ -1,5 +1,11 @@
 # @apogeelabs/the-agency
 
+## 0.8.0
+
+### Minor Changes
+
+- 31b5ea5: Prep pr now generates full review description
+
 ## 0.7.0
 
 ### Minor Changes

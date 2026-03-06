@@ -1,5 +1,12 @@
 # @apogeelabs/the-agency
 
+## 0.7.0
+
+### Minor Changes
+
+- Update review-pr command
+- 405d5ce: Review-pr command allowed to update PR description if user chooses
+
 ## 0.6.0
 
 ### Minor Changes

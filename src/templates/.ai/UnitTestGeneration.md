@@ -10,9 +10,9 @@ Before generating any tests, complete these steps in order:
 
 1. **Branch analysis** (Coverage-Driven Test Planning): Read the source, enumerate every branch, map each to a test scenario.
 2. **Superfluous test check** (Superfluous Test Prevention): Verify each planned scenario covers a distinct branch, not the same branch with different values.
-3. **Execution location check** (CRITICAL RULE #1): Execute methods under test in `beforeEach()`, not in `it()` blocks.
-4. **Mock configuration check** (CRITICAL RULE #2): Configure mock behavior in `beforeEach`, not at module level.
-5. **Callback invocation check** (CRITICAL RULE #3): Use `mockImplementation` for callbacks, not `mock.calls[N][M]()`.
+3. **Execution location check** (CRITICAL RULE 1): Execute methods under test in `beforeEach()`, not in `it()` blocks.
+4. **Mock configuration check** (CRITICAL RULE 2): Configure mock behavior in `beforeEach`, not at module level.
+5. **Callback invocation check** (CRITICAL RULE 3): Use `mockImplementation` for callbacks, not `mock.calls[N][M]()`.
 
 Once tests are generated:
 
@@ -21,7 +21,7 @@ Once tests are generated:
 
 ---
 
-## CRITICAL RULE #1: Test Execution Location
+## CRITICAL RULE 1: Test Execution Location
 
 ⚠️ **NON-NEGOTIABLE RULE** ⚠️
 
@@ -97,7 +97,7 @@ Before writing any test suite, verify:
 
 ---
 
-## CRITICAL RULE #2: Mock Configuration Location
+## CRITICAL RULE 2: Mock Configuration Location
 
 ⚠️ **NON-NEGOTIABLE RULE** ⚠️
 
@@ -152,7 +152,7 @@ const mockLuxon = {
 
 ---
 
-## CRITICAL RULE #3: Callback Invocation via mockImplementation
+## CRITICAL RULE 3: Callback Invocation via mockImplementation
 
 ⚠️ **NON-NEGOTIABLE RULE** ⚠️
 
@@ -329,7 +329,7 @@ describe("when status is inactive", () => {
     - Inner `describe` blocks handle specific scenarios ("when X condition")
 - **Test descriptions**:
     - `describe` blocks handle the "when" conditions/scenarios
-    - `it` blocks focus purely on "should" assertions (no conditions). See **CRITICAL RULE #1** above.
+    - `it` blocks focus purely on "should" assertions (no conditions). See **CRITICAL RULE 1** above.
     - Avoid redundancy - don't repeat conditions in both `describe` and `it`
 - **Grouping logic**:
     - Group related test cases under shared setup scenarios
@@ -366,7 +366,7 @@ describe("when status is inactive", () => {
 - **State initialization**: Variables initialized in `beforeEach`
 - **Fresh state guarantee**:
     - Call `jest.clearAllMocks()` and `jest.resetModules()` in outer `beforeEach`
-    - **Do NOT use `jest.resetAllMocks()`** in the outer `beforeEach` — it wipes implementations, which breaks module-level `mockReturnThis()` chains (see CRITICAL RULE #2 exception)
+    - **Do NOT use `jest.resetAllMocks()`** in the outer `beforeEach` — it wipes implementations, which breaks module-level `mockReturnThis()` chains (see CRITICAL RULE 2 exception)
     - Use `mockReset()` on **individual mocks** when a nested `beforeEach` needs to replace behavior already configured by an outer `beforeEach`
     - **Never use `mockRestore()`** — it only applies to `jest.spyOn`, which this codebase does not use
 
@@ -385,14 +385,14 @@ Am I in the **outer** `beforeEach`?
 
 ## Mocking Strategy
 
-- **Module-level mock declarations**: Dependencies mocked above test suites with bare `jest.fn()` — see **CRITICAL RULE #2** for configuration rules
+- **Module-level mock declarations**: Dependencies mocked above test suites with bare `jest.fn()` — see **CRITICAL RULE 2** for configuration rules
 - **Mock behavior configuration**: Configured per scenario in `beforeEach` blocks
 - **Mock naming**: Consistent mock prefix (e.g., `mockLogger`, `mockGetMessageBroker`)
 - **Selective mocking**: Mock only the methods being used unless it significantly raises complexity
 - **Mock verification**: Always verify mock calls when behavior depends on them
 - **Mock realism**: Ensure mocks behave like real implementations (same async patterns, error types)
 - **Mock methods**:
-    - Use `mockImplementation` when invoking callbacks passed to the mocked function — see **CRITICAL RULE #3**
+    - Use `mockImplementation` when invoking callbacks passed to the mocked function — see **CRITICAL RULE 3**
     - Use `mockResolvedValue` for async returns
     - Use `mockReturnValue` for sync returns
     - Prefer "Once" versions when appropriate (`mockResolvedValueOnce`, etc.)

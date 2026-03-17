@@ -67,27 +67,50 @@ The developer can accept the default or specify another branch. Use whatever the
 
 ## Step 3: Gather Diff
 
-Check that there are commits ahead of the target branch:
+Fetch the latest state of the target branch from the remote so comparisons reflect what's actually on the remote, not a potentially stale local copy:
 
 ```bash
-git log --oneline $TARGET..HEAD
+git fetch origin $TARGET
+```
+
+### 3.1: Resolve Comparison Ref
+
+Default to `origin/$TARGET` (the remote tracking ref) for all diff and log comparisons. Before proceeding, check whether a local copy of the target branch exists and is ahead of the remote:
+
+```bash
+git rev-list --count origin/$TARGET..$TARGET 2>/dev/null
+```
+
+- **If the command fails** (no local branch exists), or **returns 0** (local is behind or even with remote): use `origin/$TARGET` silently. No prompt needed.
+- **If the count is greater than 0**: the local branch has commits not yet on the remote. Ask the developer:
+
+> **Your local `{$TARGET}` is {count} commit(s) ahead of `origin/{$TARGET}`.** Use local or remote for comparison? (default: remote)
+
+Use whichever ref the developer chooses as `$COMPARE_REF` for all subsequent diff and log commands. If they accept the default or don't respond, use `origin/$TARGET`.
+
+### 3.2: Check for Commits
+
+Check that there are commits ahead of the comparison ref:
+
+```bash
+git log --oneline $COMPARE_REF..HEAD
 ```
 
 **If no commits are returned**, stop and output:
 
-> **No commits ahead of `{$TARGET}`. Nothing to PR.** You may need to rebase.
+> **No commits ahead of `{$COMPARE_REF}`. Nothing to PR.** You may need to rebase.
 
-Gather the change data:
+### 3.3: Gather Change Data
 
 ```bash
 # File list with change stats
-git diff --stat $TARGET...HEAD
+git diff --stat $COMPARE_REF...HEAD
 
 # Full diff
-git diff $TARGET...HEAD
+git diff $COMPARE_REF...HEAD
 
 # Commit log (excluding merges)
-git log --no-merges --oneline $TARGET..HEAD
+git log --no-merges --oneline $COMPARE_REF..HEAD
 ```
 
 ## Step 4: Categorize and Filter Files

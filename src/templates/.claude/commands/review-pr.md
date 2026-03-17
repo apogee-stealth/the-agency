@@ -50,19 +50,52 @@ gh pr view --json number,title,baseRefName,headRefName,body,additions,deletions,
 
 ## Step 3: Gather Diff Information
 
-Use `gh pr diff` to get the diff as GitHub sees it. This avoids stale-local-branch problems where a behind-origin base branch inflates the diff with already-merged changes from other PRs.
+### 3.1: Resolve Comparison Ref
+
+Fetch the latest state of the base branch from the remote:
 
 ```bash
-# File list with change stats
-gh pr diff --stat
+git fetch origin $baseRefName
+```
 
-# Full diff (for analysis)
+Default to using the remote for comparison (via `gh pr diff`). Before proceeding, check whether the local copy of the base branch is ahead of the remote:
+
+```bash
+git rev-list --count origin/$baseRefName..$baseRefName 2>/dev/null
+```
+
+- **If the command fails** (no local branch exists), or **returns 0** (local is behind or even with remote): use the remote. No prompt needed.
+- **If the count is greater than 0**: the local branch has commits not yet on the remote. Ask the developer:
+
+> **Your local `{baseRefName}` is {count} commit(s) ahead of `origin/{baseRefName}`.** Use local or remote for comparison? (default: remote)
+
+Store the choice as `$DIFF_MODE` — either `remote` (default) or `local`.
+
+### 3.2: Get the Diff
+
+**If `$DIFF_MODE` is `remote`** (the 95% case):
+
+Use `gh pr diff` to get the full diff as GitHub sees it. This avoids stale-local-branch problems where a behind-origin base branch inflates the diff with already-merged changes from other PRs.
+
+```bash
 gh pr diff
 ```
 
-**For commit messages**, use the `commits` array already captured in Step 2 — that is the authoritative commit list for this PR. Do NOT use `git log`, which can include commits from other PRs if the local base branch is behind origin.
+**If `$DIFF_MODE` is `local`:**
 
-**Cross-check**: Compare the file count from `gh pr diff --stat` against the `changedFiles` value from Step 2. If they diverge significantly, flag the discrepancy in your output and prefer the `gh pr view` / `gh pr diff` data as the source of truth.
+Use local git to diff against the local base branch:
+
+```bash
+git diff $baseRefName...HEAD
+```
+
+⚠️ Note: local diffs may differ slightly from GitHub's view in repos with complex merge histories.
+
+### 3.3: Stats and Commit Messages
+
+File-level stats (additions, deletions, file count) are already available from the `gh pr view --json` output captured in Step 2 — don't duplicate that work here.
+
+**For commit messages**, use the `commits` array already captured in Step 2 — that is the authoritative commit list for this PR. Do NOT use `git log`, which can include commits from other PRs if the local base branch is behind origin.
 
 ## Step 4: Categorize and Filter Files
 

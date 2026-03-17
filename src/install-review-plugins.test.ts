@@ -111,6 +111,17 @@ describe("installReviewPlugins", () => {
         expect(mockCopyFile).not.toHaveBeenCalled();
     });
 
+    it("aborts when overwrite confirm is cancelled via Ctrl-C", async () => {
+        mockPrompts
+            .mockResolvedValueOnce({ selected: ["general.md"] })
+            .mockResolvedValueOnce({ proceed: undefined });
+        mockAccess.mockResolvedValue(undefined);
+
+        await installReviewPlugins();
+
+        expect(mockCopyFile).not.toHaveBeenCalled();
+    });
+
     it("skips overwrite prompt when no conflicts", async () => {
         mockPrompts.mockResolvedValue({ selected: ["general.md"] });
         mockAccess.mockRejectedValue(new Error("ENOENT"));

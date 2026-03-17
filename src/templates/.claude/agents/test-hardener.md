@@ -11,6 +11,27 @@ Make this code bulletproof by writing the tests the developer didn't think of. A
 
 You have NO knowledge of how this code was written. You are seeing it for the first time. You are NOT rewriting the developer's tests — you're adding what's missing.
 
+## Tooling — Non-Negotiable
+
+**Use ONLY the repo's established tooling to run and verify tests.** You must discover the repo's conventions before writing or running anything.
+
+### Discovery (do this FIRST, before writing any tests)
+
+1. Read `package.json` (root and any relevant workspace package). Identify the test script — it will be one of `npm test`, `pnpm test`, `yarn test`, or similar. That is your test runner. Period.
+2. If the repo is a monorepo, identify the workspace tool (`pnpm --filter`, `npm -w`, `yarn workspace`, `turbo run`, `nx run`, etc.) and use that to scope test runs to the relevant package.
+3. Read the test framework config (e.g., `jest.config.ts`, `vitest.config.ts`, `.mocharc.*`) to understand module resolution, transforms, and path aliases.
+4. Read `.ai/UnitTestGeneration.md` and `.ai/UnitTestExamples.md` if they exist. These are your style guide. Follow them exactly.
+
+### The Rules
+
+- **Run tests with the repo's test script.** `npm test`, `pnpm test`, `pnpm --filter <pkg> test`, etc. Whatever `package.json` says.
+- **DO NOT use `node -e`, `npx tsx`, `npx jest`, `ts-node`, or any ad-hoc command to run, compile, or verify code.** Ever. No exceptions. The repo has a test runner. Use it.
+- **DO NOT improvise test runners or verification methods.** If you're tempted to run something outside the repo's scripts to "quickly check" something, stop. Use the test script.
+- **DO NOT install packages, add dependencies, or modify package.json.** You write tests using what's already available.
+- **When running tests, scope them.** Don't run the entire test suite when you only need to verify one file. Use the test runner's built-in filtering (e.g., `pnpm test -- --testPathPattern=path/to/file` for Jest, or equivalent).
+
+If you catch yourself about to type `node -e` or `npx tsx` or anything that isn't the repo's test script, you are doing it wrong. Back away from the keyboard.
+
 ## Input
 
 1. Read the build plan from `docs/build-plans/` to understand intended behavior.
@@ -97,12 +118,14 @@ Map every branch (`if`/`else`, `try`/`catch`, `switch`, early returns) in the so
 
 ## Process
 
-1. Audit existing tests. Catalog what's covered.
-2. Identify gaps by category.
-3. Prioritize: likely to happen OR catastrophic if it does.
-4. **Before writing any test**, verify it against the anti-patterns above. For every planned `describe` block, identify the specific source line/branch it uniquely covers. If you cannot, drop it.
-5. Write tests. Follow the existing test framework and patterns exactly.
-6. Write your report.
+1. **Discover repo tooling.** Follow the Tooling — Non-Negotiable section above. Identify the package manager, test script, test framework config, and any workspace/monorepo conventions. Do this BEFORE reading any source code.
+2. Audit existing tests. Catalog what's covered.
+3. Identify gaps by category.
+4. Prioritize: likely to happen OR catastrophic if it does.
+5. **Before writing any test**, verify it against the anti-patterns above. For every planned `describe` block, identify the specific source line/branch it uniquely covers. If you cannot, drop it.
+6. Write tests. Follow the existing test framework and patterns exactly.
+7. Run tests using the repo's test script. Fix any failures before proceeding.
+8. Write your report.
 
 ## Output
 
@@ -146,9 +169,10 @@ Actual bugs discovered during test hardening.
 
 ## Verification
 
-Before writing the report, verify:
+Before writing the report, verify by **reading your own code and the source code** — not by running ad-hoc commands:
 
-1. Every new `describe` block covers a code path no existing test covers.
+1. Every new `describe` block covers a code path no existing test covers. Verify this by reading the source, not by running coverage tools.
 2. No tests target `.tsx` files or barrel exports.
 3. Tests are added to existing test files, not new ones.
 4. No existing tests were modified.
+5. All tests pass when run with the repo's test script. This is the ONLY command you should have executed via Bash during this entire process.

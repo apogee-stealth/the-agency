@@ -67,6 +67,31 @@ describe("getFilesToSync", () => {
         const totalItems = agents.length + commands.length + ai.length;
         expect(files).toHaveLength(totalItems);
     });
+
+    it("throws when an unknown category is passed", () => {
+        expect(() =>
+            getFilesToSync({ reviewPlugins: [{ file: "general.md", description: "test" }] })
+        ).toThrow();
+    });
+});
+
+describe("manifest", () => {
+    it("has seven command entries", () => {
+        expect(manifest.commands).toHaveLength(7);
+    });
+
+    it("includes dnd-alignment in commands", () => {
+        const files = manifest.commands.map((c) => c.file);
+        expect(files).toContain("dnd-alignment.md");
+    });
+
+    it("has six agent entries", () => {
+        expect(manifest.agents).toHaveLength(6);
+    });
+
+    it("has three ai entries", () => {
+        expect(manifest.ai).toHaveLength(3);
+    });
 });
 
 describe("fileExists", () => {
@@ -119,6 +144,15 @@ describe("sync", () => {
         expect(mockCopyFile).not.toHaveBeenCalled();
     });
 
+    it("aborts when overwrite confirm is cancelled via Ctrl-C", async () => {
+        mockAccess.mockResolvedValue(undefined); // all files exist
+        mockPrompts.mockResolvedValue({ proceed: undefined });
+
+        await sync();
+
+        expect(mockCopyFile).not.toHaveBeenCalled();
+    });
+
     it("skips overwrite prompt when no conflicts exist", async () => {
         mockAccess.mockRejectedValue(new Error("ENOENT"));
 
@@ -143,6 +177,20 @@ describe("sync", () => {
             })
         );
         expect(mockCopyFile).toHaveBeenCalledTimes(1);
+    });
+
+    it("groups multiple picked items from the same category correctly", async () => {
+        mockAccess.mockRejectedValue(new Error("ENOENT"));
+        mockPrompts.mockResolvedValue({
+            selected: [
+                { category: "agents", item: { file: "dev.md", description: "Dev agent" } },
+                { category: "agents", item: { file: "reviewer.md", description: "Reviewer" } },
+            ],
+        });
+
+        await sync({ pick: true });
+
+        expect(mockCopyFile).toHaveBeenCalledTimes(2);
     });
 
     it("exits cleanly when nothing selected in pick mode", async () => {

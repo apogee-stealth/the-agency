@@ -1,5 +1,11 @@
 # @apogeelabs/the-agency
 
+## 0.9.0
+
+### Minor Changes
+
+- f8c51b4: Prefer remote branches on review/prep pr, prompt if local target is newer than remote. Update documentation
+
 ## 0.8.0
 
 ### Minor Changes

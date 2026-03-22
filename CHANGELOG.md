@@ -1,5 +1,11 @@
 # @apogeelabs/the-agency
 
+## 0.11.0
+
+### Minor Changes
+
+- c34d3dc: Make phase markers explicit in auto-build
+
 ## 0.10.0
 
 ### Minor Changes

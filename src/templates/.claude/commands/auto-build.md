@@ -22,6 +22,44 @@ You need two things:
 5. **Report what happened, not what the agent said.** Read the output files and summarize.
 6. **Do not commit or create a PR if the build pipeline fails.** Phases 5 and 6 only run if Phases 1-3 succeed.
 
+## Pipeline Markers
+
+External systems (e.g., TPS) watch PTY output for structured markers to trigger workflow automations. You MUST output these markers exactly as specified — they are line-start anchored headings matched by regex.
+
+**Phase markers** — output at the START of each phase:
+
+```
+## Phase 1: Development
+## Phase 2: Code Review
+## Phase 3: Test Hardening
+## Phase 4: Retrospective
+## Phase 5: Committing
+## Phase 6: Preparing Draft PR
+```
+
+**Fix loop markers** — output when entering a fix loop:
+
+```
+## Fix Loop [N]: [Source Phase] → Dev
+```
+
+Example: `## Fix Loop 1: Code Review → Dev`
+
+**Completion markers** — output at the end of the pipeline:
+
+```
+## Commit Complete: [short hash]
+## Auto Build Complete: [Feature Name]
+```
+
+**Failure markers** — output when the pipeline fails:
+
+```
+## Auto Build Failed: [Feature Name]
+```
+
+These markers must appear on their own line at the start of output, not buried inside code blocks or report summaries.
+
 ## Setup
 
 Before starting, ensure the reports directory exists:
@@ -37,6 +75,12 @@ Dev → Review → [Fix loop if needed] → Test Hardener → [Fix loop if neede
 ```
 
 ## Phase 1: Development
+
+Output this marker before delegating:
+
+```
+## Phase 1: Development
+```
 
 Delegate to the **dev** subagent. Tell it:
 
@@ -57,11 +101,23 @@ After each dev agent run (initial or fix loop), run the project's checks before 
 
 Check `package.json` for available scripts. Skip any that don't exist.
 
-If any check fails, send the failures back to the dev agent as a fix loop (same 2-loop cap). Do NOT proceed to review with broken lint, tests, or build. If the dev agent cannot resolve the failures within 2 fix loops, produce a failure summary and stop.
+If any check fails, output the fix loop marker before re-entering Phase 1:
+
+```
+## Fix Loop [N]: Validation → Dev
+```
+
+Send the failures back to the dev agent as a fix loop (same 2-loop cap). Do NOT proceed to review with broken lint, tests, or build. If the dev agent cannot resolve the failures within 2 fix loops, produce a failure summary and stop.
 
 Once the validation gate passes, proceed to Phase 2.
 
 ## Phase 2: Code Review
+
+Output this marker before delegating:
+
+```
+## Phase 2: Code Review
+```
 
 Delegate to the **reviewer** subagent. Tell it:
 
@@ -74,9 +130,13 @@ Delegate to the **reviewer** subagent. Tell it:
 ### If verdict is FAIL:
 
 1. Extract the must-fix items into `docs/reports/review-fixes-[feature-name].md`
-2. Go back to Phase 1 (the dev agent will see the fixes file)
-3. After fixes, re-run Phase 2
-4. **Max 2 fix loops.** If it fails a third time, produce a failure summary and stop.
+2. Output the fix loop marker before re-entering Phase 1:
+    ```
+    ## Fix Loop [N]: Code Review → Dev
+    ```
+3. Go back to Phase 1 (the dev agent will see the fixes file)
+4. After fixes, re-run Phase 2
+5. **Max 2 fix loops.** If it fails a third time, produce a failure summary and stop.
 
 ### If verdict is PASS WITH FIXES:
 
@@ -87,6 +147,12 @@ Note the should-fix items in the final summary. Proceed to Phase 3.
 Proceed to Phase 3.
 
 ## Phase 3: Test Hardening
+
+Output this marker before delegating:
+
+```
+## Phase 3: Test Hardening
+```
 
 Delegate to the **test-hardener** subagent. Tell it:
 
@@ -99,14 +165,24 @@ Delegate to the **test-hardener** subagent. Tell it:
 ### If verdict is FAIL (bugs found):
 
 1. Extract bugs into `docs/reports/review-fixes-[feature-name].md`
-2. Loop back to Phase 1 for fixes, then re-run Phase 3
-3. **Max 2 fix loops.** If it persists, produce a failure summary and stop.
+2. Output the fix loop marker before re-entering Phase 1:
+    ```
+    ## Fix Loop [N]: Test Hardening → Dev
+    ```
+3. Loop back to Phase 1 for fixes, then re-run Phase 3
+4. **Max 2 fix loops.** If it persists, produce a failure summary and stop.
 
 ### If verdict is PASS or PASS WITH GAPS:
 
 Proceed to Phase 4.
 
 ## Phase 4: Retrospective
+
+Output this marker before delegating:
+
+```
+## Phase 4: Retrospective
+```
 
 Delegate to the **retrospective** subagent. Tell it:
 
@@ -118,6 +194,12 @@ Delegate to the **retrospective** subagent. Tell it:
 **If the retro agent fails**: Log the failure and continue to Phase 5. Retrospective failure is NOT a pipeline blocker.
 
 ## Phase 5: Commit
+
+Output this marker before starting:
+
+```
+## Phase 5: Committing
+```
 
 All three phases passed. Time to commit.
 
@@ -133,7 +215,19 @@ All three phases passed. Time to commit.
 
 If the commit fails (e.g., pre-commit hook), fix the issue and retry once. If it fails again, produce a failure summary and stop.
 
+After a successful commit, output this marker with the short hash:
+
+```
+## Commit Complete: [short hash]
+```
+
 ## Phase 6: Auto Prep PR
+
+Output this marker before delegating:
+
+```
+## Phase 6: Preparing Draft PR
+```
 
 Delegate to the **auto-prep-pr** subagent. Tell it:
 

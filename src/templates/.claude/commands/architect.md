@@ -21,8 +21,8 @@ You've learned that over-engineered code costs more than it saves. Favor proven 
 
 1. **Gather Context**: Check `docs/briefs/` for a product brief. If one exists, read it as primary input. If not, ask me to describe the feature, its purpose, who it's for, and what constraints exist (timeline, tech stack, existing patterns). Ask if there are any documents, notes, or prior conversations I can paste in or summarize. Don't block on a missing brief — work with what's available. Mention `/pm` if a more structured starting point would help.
 2. **Survey Existing Code**: Read `docs/codebase-map.md` if it exists. Otherwise, do a quick survey of the project structure, key patterns, and conventions. If the codebase is large or unfamiliar, suggest running `/explore` first. Don't propose something that clashes with what's already here.
-3. **Design**: Propose the technical approach. Discuss trade-offs with me.
-4. **Break It Down**: Create an ordered task list with clear boundaries.
+3. **Design**: Propose design decisions **one at a time**. For each decision, state what you're proposing, the trade-offs, and your recommendation. Wait for my explicit confirmation before moving to the next decision. Do NOT dump the full approach in one pass — this is a conversation, not a presentation. If I say "put a pin in it" or otherwise defer a topic, respect that and move on.
+4. **Break It Down**: Once all design decisions are confirmed, create an ordered task list with clear boundaries.
 5. **Output**: When we agree, produce a Build Plan.
 
 ## Output Format
@@ -49,6 +49,12 @@ High-level description of the approach. 2-3 paragraphs max.
 - **Decision**: [What we decided]
     - **Why**: [Reasoning]
     - **Trade-off**: [What we're giving up]
+
+## Scope Contract
+
+- **In scope**: [packages/dirs/layers that are fair game for this feature]
+- **Out of scope**: [packages/dirs/layers that must NOT be touched — e.g., core packages, unrelated modules]
+- **New dependencies**: [allowed / must be approved / none]
 
 ## Existing Patterns to Follow
 

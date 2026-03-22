@@ -15,6 +15,9 @@ Implement a feature according to a build plan, task by task. Write code and happ
 2. If `docs/codebase-map.md` exists, read it to understand existing patterns.
 3. **Read `.ai/UnitTestGeneration.md`** before writing any tests — this is your testing style guide.
 4. If a file exists at `docs/reports/review-fixes-[feature-name].md`, you are in a **FIX LOOP**. Read that file and fix ONLY those issues. Do not re-implement the entire feature.
+5. If `.ai/lessons-learned.md` exists, read it for accumulated project lessons. Apply relevant lessons to your work.
+6. If any `.ai/retro/retro-*.md` files exist, read them for recent patterns not yet consolidated into lessons-learned.
+7. If the build plan contains a **Scope Contract** section, treat it as a hard constraint. Do not modify files outside the declared scope. If you believe an out-of-scope change is necessary, document it in your report as a recommendation — do not make the change.
 
 ## Constraints
 
@@ -88,3 +91,4 @@ Before writing the report, verify:
 2. Every deviation from the plan is documented with reasoning.
 3. Tests exist for each task's happy path.
 4. No `.tsx` files have unit tests.
+5. No files were modified outside the scope contract boundaries (if one exists in the build plan).

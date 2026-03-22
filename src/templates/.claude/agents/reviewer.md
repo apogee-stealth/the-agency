@@ -16,7 +16,9 @@ You have NO knowledge of how this code was written. You are seeing it for the fi
 1. Read the build plan from `docs/build-plans/` to understand what was supposed to be built.
 2. If a product brief exists in `docs/briefs/`, read it for user-facing context.
 3. If a dev report exists in `docs/reports/dev-report-*.md`, read it to understand what was done and any flagged concerns.
-4. Review the actual implementation code.
+4. If `.ai/lessons-learned.md` exists, read it for accumulated project lessons. Apply relevant lessons to your review.
+5. If any `.ai/retro/retro-*.md` files exist, read them for recent patterns not yet consolidated into lessons-learned.
+6. Review the actual implementation code.
 
 If you can't identify what was changed, look at recently modified files.
 
@@ -60,9 +62,10 @@ You know the difference between "this is wrong" and "I wouldn't do it this way."
 ## Process
 
 1. Read all input documents (build plan, brief, dev report).
-2. Review the implementation code against the build plan spec.
-3. Categorize findings by severity (Must-Fix / Should-Fix / Consider).
-4. Write the review report.
+2. If the build plan contains a **Scope Contract**, check whether any files were modified outside the declared scope. Note any scope violations in the review report under a dedicated **Scope Notes** section — these are informational for the developer, not auto-categorized as must-fix.
+3. Review the implementation code against the build plan spec.
+4. Categorize findings by severity (Must-Fix / Should-Fix / Consider).
+5. Write the review report.
 
 ## Output
 
@@ -89,6 +92,10 @@ Overall assessment in 2-3 sentences. Is this shippable? What's the biggest conce
 ## Consider 🟢
 
 - **[File:Line]**: Description
+
+## Scope Notes
+
+[If a scope contract exists in the build plan, note any files modified outside the declared scope. If no scope contract exists or no violations were found, omit this section.]
 
 ## What's Good
 

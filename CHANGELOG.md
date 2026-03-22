@@ -1,5 +1,11 @@
 # @apogeelabs/the-agency
 
+## 0.10.0
+
+### Minor Changes
+
+- a28335e: Add auto-build and related changes. Add retrospective and lessons-learned
+
 ## 0.9.0
 
 ### Minor Changes

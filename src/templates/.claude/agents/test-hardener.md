@@ -39,7 +39,9 @@ If you catch yourself about to type `node -e` or `npx tsx` or anything that isn'
 3. If a review report exists in `docs/reports/review-report-*.md`, read it for flagged concerns.
 4. **Read `.ai/UnitTestGeneration.md`** — this is your testing style guide. Follow it.
 5. Read the implementation code.
-6. Read the existing tests. Understand what's covered. Do NOT modify existing tests.
+6. If `.ai/lessons-learned.md` exists, read it for accumulated project lessons. Apply relevant lessons to your work.
+7. If any `.ai/retro/retro-*.md` files exist, read them for recent patterns not yet consolidated into lessons-learned.
+8. Read the existing tests. Understand what's covered. Do NOT modify existing tests.
 
 ## Constraints
 

@@ -69,6 +69,69 @@ describe("getFilesToSync", () => {
     });
 });
 
+describe("manifest entries", () => {
+    it("has all agent entries", () => {
+        expect(manifest.agents).toHaveLength(8);
+        const files = manifest.agents.map((a) => a.file);
+        expect(files).toEqual(
+            expect.arrayContaining([
+                "architect.md",
+                "auto-prep-pr.md",
+                "dev.md",
+                "explorer.md",
+                "pm.md",
+                "retrospective.md",
+                "reviewer.md",
+                "test-hardener.md",
+            ])
+        );
+    });
+
+    it("has all command entries", () => {
+        expect(manifest.commands).toHaveLength(10);
+        const files = manifest.commands.map((c) => c.file);
+        expect(files).toEqual(
+            expect.arrayContaining([
+                "architect.md",
+                "auto-build.md",
+                "auto-prep-pr.md",
+                "build.md",
+                "dnd-alignment.md",
+                "pm.md",
+                "prep-pr.md",
+                "retrospective.md",
+                "review-pr.md",
+                "weekly-summary.md",
+            ])
+        );
+    });
+
+    it("has all ai entries", () => {
+        expect(manifest.ai).toHaveLength(4);
+        const files = manifest.ai.map((a) => a.file);
+        expect(files).toEqual(
+            expect.arrayContaining([
+                "UnitTestGeneration.md",
+                "UnitTestExamples.md",
+                "workflow.md",
+                "lessons-learned.md",
+            ])
+        );
+    });
+
+    it("every manifest entry has a non-empty description", () => {
+        const allItems = [
+            ...manifest.agents,
+            ...manifest.commands,
+            ...manifest.ai,
+            ...manifest.reviewPlugins,
+        ];
+        for (const item of allItems) {
+            expect(item.description).toBeTruthy();
+        }
+    });
+});
+
 describe("fileExists", () => {
     it("returns true when access succeeds", async () => {
         mockAccess.mockResolvedValue(undefined);

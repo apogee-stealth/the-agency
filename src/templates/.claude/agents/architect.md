@@ -61,6 +61,12 @@ High-level description of the approach. 2-3 paragraphs max.
     - **Trade-off**: [What we're giving up]
     - **Assumption**: [If this decision rests on an assumption, flag it]
 
+## Scope Contract
+
+- **In scope**: [packages/dirs/layers that are fair game for this feature]
+- **Out of scope**: [packages/dirs/layers that must NOT be touched — e.g., core packages, unrelated modules]
+- **New dependencies**: [allowed / must be approved / none]
+
 ## Existing Patterns to Follow
 
 Patterns, conventions, or utilities already in the codebase that this feature should use.

@@ -34,30 +34,46 @@ mkdir -p docs/{briefs,build-plans,reports}
                    (handoff via files)
                             │
 ┌─────────────────────────────────────────────────────────────────┐
-│  AUTONOMOUS AGENTS (isolated context, file-based communication) │
+│  BUILD PIPELINE (choose your level of autonomy)                 │
 │                                                                 │
-│  These are the SAME PERSONAS as above, but autonomous.          │
-│  Use when you trust the output pattern.                         │
+│  /build       ──→  manual gates between phases                  │
+│  /auto-build  ──→  fully autonomous: build + commit + draft PR  │
 │                                                                 │
-│  pm agent  ──→  docs/briefs/feature.md                          │
-│  architect agent  ──→  docs/build-plans/feature.md              │
+│  Both orchestrate the same agent pipeline:                      │
 │                                                                 │
-│  ┌──────────┐   ┌──────────┐   ┌──────────┐                   │
-│  │ dev      │──→│ reviewer  │──→│ test-    │                   │
-│  │ agent    │   │ agent     │   │ hardener │                   │
-│  │          │   │           │   │ agent    │                   │
-│  │ Writes   │   │ Read-only │   │ Writes   │                   │
-│  │ code +   │   │ review    │   │ tests    │                   │
-│  │ tests    │   │           │   │ only     │                   │
-│  └────┬─────┘   └────┬─────┘   └────┬─────┘                   │
+│  ┌──────────┐   ┌───────────┐   ┌──────────┐                    │
+│  │ dev      │──→│ reviewer  │──→│ test-    │                    │
+│  │ agent    │   │ agent     │   │ hardener │                    │
+│  │          │   │           │   │ agent    │                    │
+│  │ Writes   │   │ Read-only │   │ Writes   │                    │
+│  │ code +   │   │ review    │   │ tests    │                    │
+│  │ tests    │   │           │   │ only     │                    │
+│  └────┬─────┘   └────┬──────┘   └────┬─────┘                    │
 │       ▼              ▼              ▼                           │
 │   dev-report    review-report   test-report                     │
 │                                                                 │
-│   ◄── fix loops if review/test fail ──►                        │
+│   ◄── fix loops if review/test fail ──►                         │
 │                                                                 │
+│  /auto-build also runs:                                         │
+│  auto-prep-pr agent  ──→  pushes branch + creates draft PR      │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+                   (reports land in docs/reports/)
+                            │
+┌─────────────────────────────────────────────────────────────────┐
+│  STANDALONE AGENTS & COMMANDS                                   │
+│                                                                 │
+│  pm agent  ──→  docs/briefs/feature.md                          │
+│  architect agent  ──→  docs/build-plans/feature.md              │
 │  explorer agent  ──→  docs/codebase-map.md                      │
+│  auto-prep-pr agent  ──→  pushes branch + creates draft PR      │
+│  retrospective agent  ──→  .ai/retro/retro-[feature].md         │
 │                                                                 │
-│  /build  ──→  orchestrates: dev → review → test                 │
+│  /retrospective  ──→  consolidates retros into lessons-learned  │
+│  /prep-pr        ──→  interactive PR prep and draft creation    │
+│  /auto-prep-pr   ──→  non-interactive PR prep via agent         │
+│  /review-pr      ──→  structured PR review briefing             │
+│  /weekly-summary ──→  weekly synthesis of merged PRs            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -65,24 +81,33 @@ mkdir -p docs/{briefs,build-plans,reports}
 
 ### Interactive Commands (`.claude/commands/`)
 
-| Command      | What it does                              | Entry point for             |
-| ------------ | ----------------------------------------- | --------------------------- |
-| `/pm`        | Collaborative requirements discovery      | Defining what to build      |
-| `/architect` | Collaborative technical design            | Designing how to build it   |
-| `/build`     | Orchestrates the agent execution pipeline | Running dev → review → test |
+| Command           | What it does                                       | Entry point for                   |
+| ----------------- | -------------------------------------------------- | --------------------------------- |
+| `/pm`             | Collaborative requirements discovery               | Defining what to build            |
+| `/architect`      | Collaborative technical design                     | Designing how to build it         |
+| `/build`          | Orchestrates dev → review → test with manual gates | Controlled pipeline execution     |
+| `/auto-build`     | Fully autonomous build + commit + draft PR         | Hands-off pipeline execution      |
+| `/prep-pr`        | Interactive PR prep and draft creation             | Getting a branch ready for review |
+| `/auto-prep-pr`   | Non-interactive PR prep via auto-prep-pr agent     | Automated PR creation             |
+| `/review-pr`      | Structured PR review briefing                      | Reviewing an open PR              |
+| `/retrospective`  | Consolidates retro files into lessons-learned      | Learning from pipeline runs       |
+| `/weekly-summary` | Weekly synthesis of merged PRs                     | Team status updates               |
+| `/dnd-alignment`  | D&D alignment chart from commit history            | Fun                               |
 
 ### Autonomous Agents (`.claude/agents/`)
 
-| Agent           | Tools                               | Context  | What it does                                   |
-| --------------- | ----------------------------------- | -------- | ---------------------------------------------- |
-| `pm`            | Read, Write, Edit, Glob, Grep       | Isolated | Drafts a product brief from notes              |
-| `architect`     | Read, Write, Edit, Glob, Grep, Bash | Isolated | Drafts a build plan from a brief or notes      |
-| `dev`           | Read, Write, Edit, Glob, Grep, Bash | Isolated | Implements build plan, writes happy-path tests |
-| `reviewer`      | Read, Glob, Grep, Bash              | Isolated | Read-only code review, produces verdict        |
-| `test-hardener` | Read, Write, Edit, Glob, Grep, Bash | Isolated | Writes edge case & failure mode tests          |
-| `explorer`      | Read, Glob, Grep, Bash              | Isolated | Maps and documents the codebase (read-only)    |
+| Agent           | Tools                               | Context  | What it does                                      |
+| --------------- | ----------------------------------- | -------- | ------------------------------------------------- |
+| `pm`            | Read, Write, Edit, Glob, Grep       | Isolated | Drafts a product brief from notes                 |
+| `architect`     | Read, Write, Edit, Glob, Grep, Bash | Isolated | Drafts a build plan from a brief or notes         |
+| `dev`           | Read, Write, Edit, Glob, Grep, Bash | Isolated | Implements build plan, writes happy-path tests    |
+| `reviewer`      | Read, Glob, Grep, Bash              | Isolated | Read-only code review, produces verdict           |
+| `test-hardener` | Read, Write, Edit, Glob, Grep, Bash | Isolated | Writes edge case & failure mode tests             |
+| `explorer`      | Read, Glob, Grep, Bash              | Isolated | Maps and documents the codebase (read-only)       |
+| `auto-prep-pr`  | Read, Glob, Grep, Bash              | Isolated | Pushes branch, creates draft PR (non-interactive) |
+| `retrospective` | Read, Write, Glob, Bash             | Isolated | Extracts patterns from reports into retro files   |
 
-Note: `reviewer` and `explorer` are deliberately read-only — they can't modify project code.
+Note: `reviewer`, `explorer`, and `auto-prep-pr` are deliberately read-only — they can't modify project code.
 
 ## Workflows
 
@@ -101,7 +126,7 @@ claude> /architect
 # ... back-and-forth until plan is right
 # Output: docs/build-plans/feature.md
 
-# Session 3: Execute the pipeline
+# Session 3: Execute the pipeline with manual gates
 claude> /build
 # ... confirms once, then runs dev → review → test automatically
 # ... only stops if fix loops are exhausted
@@ -126,15 +151,16 @@ claude> /build
 
 ### Full Autonomous (Trust the Pipeline)
 
-When you've done this enough to trust the drafts:
+When you've done this enough to trust the whole thing:
 
 ```bash
 # Autonomous brief and plan
 claude> Use the pm agent to draft a brief, then the architect agent to create a build plan
 # Review both docs, edit if needed
 
-# Execute
-claude> /build
+# Fully autonomous: build, commit, and draft PR
+claude> /auto-build
+# You get a draft PR at the end, or a failure report
 ```
 
 ### CTO-Hands-You-a-Napkin
@@ -165,14 +191,31 @@ claude> /build
 claude> Use the reviewer agent to review the auth module changes
 ```
 
+### Post-Build: Learn From What Happened
+
+After one or more builds complete, extract patterns and build institutional memory:
+
+```bash
+# Step 1: Extract patterns from pipeline reports (per feature)
+claude> Use the retrospective agent for the user-auth feature
+# Output: .ai/retro/retro-user-auth.md
+
+# Step 2: Consolidate retros into shared lessons (interactive)
+claude> /retrospective
+# ... walk through findings, decide what to keep
+# Output: .ai/lessons-learned.md
+```
+
 ## How Fix Loops Work
 
-The `/build` orchestrator handles failures:
+The `/build` and `/auto-build` orchestrators handle failures:
 
 1. **Review fails** (🔴) → extracts must-fix items → fresh dev agent reads only the fixes file → commits fixes → re-runs review → max 2 loops
 2. **Test hardening fails** (🐛) → same pattern for bugs
 
 The user approves once at the start of the pipeline. After that, fix loops run automatically, capped at 2 per phase. The only mid-pipeline interruption is escalation when a fix loop is exhausted.
+
+With `/auto-build`, there is no mid-pipeline interruption at all — if fix loops are exhausted, it stops and writes a failure report.
 
 ## Git Workflow
 
@@ -183,6 +226,7 @@ The pipeline manages git automatically:
 3. **Test hardener** commits its new test files (`test:` prefix)
 4. **Fix loop commits** use `fix:` prefix and reference what was fixed
 5. **Orchestrator** commits reports at the end (`docs:` prefix)
+6. **`/auto-build` only**: auto-prep-pr agent pushes the branch and creates a draft PR
 
 The result is a branch with clean, atomic, per-task commits:
 
@@ -197,7 +241,7 @@ b4c5d6e DEV-2315 Add login endpoint with validation
 7f8e9d0 DEV-2315 Add user model and migration
 ```
 
-At completion, the orchestrator gives you the branch name and commit history. You choose how to land it — merge, squash, open a PR, whatever fits your workflow.
+At completion, the orchestrator gives you the branch name and commit history. With `/build`, you choose how to land it. With `/auto-build`, a draft PR is already waiting.
 
 ⚠️ **Protected branches**: The dev agent verifies it's on a feature branch before every commit. If it somehow finds itself on `main`/`master`/`develop`, it stops and reports the error rather than committing.
 
@@ -212,28 +256,43 @@ docs/reports/
   ├── review-report-[feature].md  ← Review agent output
   ├── review-fixes-[feature].md   ← Fix loop items (if triggered)
   └── test-report-[feature].md    ← Test agent output
+
+.ai/retro/retro-[feature].md      ← Retrospective agent output
+.ai/lessons-learned.md             ← /retrospective consolidation output
 ```
 
 ## Directory Structure
 
 ```
 .claude/
-├── commands/                # Interactive slash commands
+├── commands/                # Slash commands
 │   ├── pm.md               # /pm → conversational requirements
 │   ├── architect.md         # /architect → conversational design
-│   └── build.md             # /build → pipeline orchestrator
+│   ├── build.md             # /build → pipeline orchestrator (manual gates)
+│   ├── auto-build.md        # /auto-build → fully autonomous pipeline
+│   ├── prep-pr.md           # /prep-pr → interactive PR prep
+│   ├── auto-prep-pr.md      # /auto-prep-pr → non-interactive PR prep
+│   ├── review-pr.md         # /review-pr → PR review briefing
+│   ├── retrospective.md     # /retrospective → consolidate retros
+│   ├── weekly-summary.md    # /weekly-summary → merged PR synthesis
+│   └── dnd-alignment.md     # /dnd-alignment → commit alignment chart
 └── agents/                  # Autonomous subagents (isolated context)
     ├── pm.md                # Brief drafting
     ├── architect.md         # Build plan drafting
     ├── dev.md               # Implementation
     ├── reviewer.md          # Code review (read-only)
     ├── test-hardener.md     # Test hardening
-    └── explorer.md          # Codebase mapping (read-only)
+    ├── explorer.md          # Codebase mapping (read-only)
+    ├── auto-prep-pr.md      # PR creation (read-only)
+    └── retrospective.md     # Pattern extraction from reports
 
 .ai/
 ├── UnitTestGeneration.md    # Testing style guide
 ├── UnitTestExamples.md      # Testing examples
-└── workflow.md              # This file
+├── workflow.md              # This file
+├── lessons-learned.md       # Accumulated lessons from retrospectives
+└── retro/                   # Per-feature retrospective files
+    └── retro-[feature].md   # Output of retrospective agent
 
 docs/
 ├── briefs/                  # PM outputs
@@ -257,6 +316,8 @@ Use **autonomous agents** when:
 - You want a first draft to react to rather than building from scratch
 - You've used the interactive versions enough to know what good output looks like
 
+Use **`/build`** when you want manual gates between phases. Use **`/auto-build`** when you trust the pipeline end-to-end and want a draft PR at the finish line.
+
 ## Customization
 
 ### Things Worth Tuning
@@ -265,13 +326,14 @@ Use **autonomous agents** when:
 - **Review criteria** in `agents/reviewer.md` — tune must-fix vs. consider thresholds
 - **Test priorities** in `agents/test-hardener.md` — focus on your domain's risk areas
 - **Build plan template** in architect files — swap in your team's RFC/ADR format
-- **Fix loop cap** in `commands/build.md` — default is 2, adjust to taste
+- **Fix loop cap** in `commands/build.md` and `commands/auto-build.md` — default is 2, adjust to taste
 - **Model selection** in agent frontmatter — default is `sonnet`, bump to `opus` for critical phases
 
 ### Agent Tool Access
 
 Tools are intentionally restricted per agent:
 
-- `reviewer` and `explorer` are **read-only** (no Write/Edit) — they observe and report
+- `reviewer`, `explorer`, and `auto-prep-pr` are **read-only** (no Write/Edit) — they observe and report
 - `dev` and `test-hardener` have full access — they need to create and modify files
+- `retrospective` can write to `.ai/retro/` only
 - Adjust in the YAML frontmatter `tools:` field

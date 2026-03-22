@@ -41,7 +41,21 @@ Delegate to the **dev** subagent. Tell it:
 - To write its report to `docs/reports/dev-report-[feature-name].md`
 - If a file exists at `docs/reports/review-fixes-[feature-name].md`, it's a FIX LOOP — fix only those issues
 
-**After the dev agent completes**: Read `docs/reports/dev-report-[feature-name].md`. Summarize for the user what was built and note any deviations from the plan. Then proceed directly to Phase 2.
+**After the dev agent completes**: Read `docs/reports/dev-report-[feature-name].md`. Summarize for the user what was built and note any deviations from the plan. Then run the validation gate before proceeding.
+
+### Validation Gate
+
+After each dev agent run (initial or fix loop), run the project's checks before proceeding to the next phase:
+
+1. Lint (e.g., `pnpm lint`) — if the project has a lint script
+2. Test (e.g., `pnpm test`) — if the project has a test script
+3. Build (e.g., `pnpm build`) — if the project has a build script
+
+Check `package.json` for available scripts. Skip any that don't exist.
+
+If any check fails, send the failures back to the dev agent as a fix loop (same 2-loop cap as review fixes). Do NOT proceed to review with broken lint, tests, or build. If the dev agent cannot resolve the failures within 2 fix loops, produce a failure summary and stop.
+
+Once the validation gate passes, proceed to Phase 2.
 
 ## Phase 2: Code Review
 
@@ -59,7 +73,7 @@ Delegate to the **reviewer** subagent. Tell it:
 2. Tell the user: **"Review found must-fix issues. Spawning dev agent to address them."**
 3. Go back to Phase 1 (the dev agent will see the fixes file)
 4. After fixes, re-run Phase 2
-5. **Max 2 fix loops.** If it fails a third time, stop and escalate to the user.
+5. **Max 2 fix loops.** If it fails a third time, produce a failure summary (see Failure section) and stop.
 
 ### If verdict is 🟡 PASS WITH FIXES:
 
@@ -84,7 +98,7 @@ Delegate to the **test-hardener** subagent. Tell it:
 1. Extract bugs into `docs/reports/review-fixes-[feature-name].md`
 2. Tell the user: **"Test hardening found bugs. Spawning dev agent to fix."**
 3. Loop back to Phase 1 for fixes, then re-run Phase 3
-4. **Max 2 fix loops.** Escalate to user if it persists.
+4. **Max 2 fix loops.** If it persists, produce a failure summary (see Failure section) and stop.
 
 ### If verdict is ✅ PASS or 🟡 PASS WITH GAPS:
 
@@ -120,4 +134,36 @@ When all phases pass, produce a final summary:
 ### Suggested Commits
 
 [From dev report]
+```
+
+## Failure
+
+When a phase exhausts its fix loops (2 max), produce a failure summary and stop. Do NOT continue to subsequent phases.
+
+```markdown
+## Build Failed: [Feature Name] ❌
+
+### Failed Phase
+
+- **Phase**: [Dev / Review / Test Hardening]
+- **Fix loops attempted**: [number]
+- **Reason**: [Brief description of why it's still failing]
+
+### What Passed
+
+[List any phases that completed successfully before the failure, or "None" if failed on first phase]
+
+### Unresolved Issues
+
+[The specific issues from the last review/test report that could not be resolved]
+
+### Files Changed
+
+[Consolidated list from dev report, if any work was done]
+
+### Reports
+
+- Dev: docs/reports/dev-report-[feature-name].md
+- Review: docs/reports/review-report-[feature-name].md (if reached)
+- Test: docs/reports/test-report-[feature-name].md (if reached)
 ```

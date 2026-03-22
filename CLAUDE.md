@@ -4,9 +4,9 @@ This is a meta-repo — it manages Claude Code configuration (agents, commands, 
 
 ## What This Repo Contains
 
-- **`src/templates/.claude/agents/`** — Subagent definitions (architect, dev, explorer, pm, reviewer, test-hardener)
-- **`src/templates/.claude/commands/`** — Slash command definitions (architect, build, dnd-alignment, pm, prep-pr, review-pr, weekly-summary)
-- **`src/templates/.ai/`** — AI context files (unit test style guide, examples)
+- **`src/templates/.claude/agents/`** — Subagent definitions (architect, auto-prep-pr, dev, explorer, pm, retrospective, reviewer, test-hardener)
+- **`src/templates/.claude/commands/`** — Slash command definitions (architect, auto-build, auto-prep-pr, build, dnd-alignment, pm, prep-pr, retrospective, review-pr, weekly-summary)
+- **`src/templates/.ai/`** — AI context files (unit test style guide, examples, workflow guide, lessons-learned)
 - **`src/review-plugins/`** — Optional review check plugins (installed via `the-agency install-review-plugins`)
 - **`src/`** — TypeScript source for the CLI sync tool
 - **`dist/`** — Compiled JS output (gitignored, built via `pnpm build`)
